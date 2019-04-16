@@ -1,0 +1,167 @@
+#include <kipr/botball.h>
+
+//variables
+
+int s_speed = 20;
+int m_speed = 45;
+int f_speed = 65;
+int l_motor = 0;
+int r_motor = 3;
+int a_servo = 1;
+//c 1650, o 0
+int l_servo = 3;
+//1275, 200
+int b_servo = 0;
+//c ,o 900
+int b_sensor = 0;
+int a_sensor = 1;
+int f_sensor = 2;
+int b_line = 3600;
+int close = 2700;
+int turn_pause = 3000;
+int lift_pause = 500;
+int l_servo_dist = 900;
+
+int main(){
+	preFunction();
+	/*exitBox();
+    while(analog(f_sensor) < close){
+        followRight();
+    }
+    backwards();
+    msleep(turn_pause);
+    while(analog(b_sensor) < b_line){
+   		rightTurn();
+    }
+    msleep(400);
+    stopMotors();
+    straightenArm();
+    lowerClaw();
+    */
+    openArm();
+	collectWater();
+}
+
+int preFunction(){
+    shut_down_in(115);
+	enable_servos(a_servo);
+    set_servo_position(a_servo,1650);
+	enable_servos(b_servo);
+    set_servo_position(b_servo,900);
+    enable_servos(l_servo);
+    msleep(1000);
+    set_servo_position(l_servo,1000);
+   	//liftClaw();
+    msleep(500);
+}
+
+int stopMotors(){
+   motor(l_motor, 0);
+   motor(r_motor, 0);
+}
+
+int openArm(){
+    set_servo_position(a_servo,0);
+    msleep(lift_pause);
+}
+
+int straightenArm(){
+    set_servo_position(a_servo,350);
+    msleep(lift_pause);
+}
+
+int closeArm(){
+    set_servo_position(a_servo,1650);
+    msleep(lift_pause);
+}
+
+int liftClaw(){
+    while(l_servo_dist > 150){
+	set_servo_position(l_servo,l_servo_dist);
+    l_servo_dist = l_servo_dist - 20;
+    msleep(100);
+    }
+}
+
+int lowerClaw(){
+    while(l_servo_dist < 1350){
+	set_servo_position(l_servo,l_servo_dist);
+    l_servo_dist = l_servo_dist + 20;
+    msleep(100);
+    }
+    msleep(lift_pause);
+}
+
+
+int exitBox(){
+	while(analog(b_sensor) < b_line){
+  		forwards(); 
+	}
+    while(analog(b_sensor) > b_line){
+  		forwards(); 
+	}
+    msleep(3000);
+    while(analog(b_sensor) < b_line){
+  		forwards(); 
+	}
+    msleep(500);
+}	
+
+int forwards(){
+   motor(l_motor, f_speed);
+   motor(r_motor, -f_speed);
+}
+
+int backwards(){
+   motor(l_motor, -m_speed);
+   motor(r_motor, m_speed);
+}
+
+int followRight(){
+    while(analog(b_sensor) > b_line){
+        driftRight();
+    }
+    while(analog(b_sensor) < b_line){
+        driftLeft();
+    }
+}
+
+int followLeft(){
+    while(analog(b_sensor) > b_line){
+        driftLeft();
+    }
+    while(analog(b_sensor) < b_line){
+        driftRight();
+    }
+}
+
+int driftLeft(){ 
+    //printf("/n moving left ");
+    motor(l_motor,s_speed);
+    motor(r_motor,-f_speed);
+}
+
+int driftRight(){
+    //printf("/n moving right ");
+    motor(l_motor,f_speed);
+    motor(r_motor,-s_speed);
+}
+
+int rightTurn(){
+    printf("/n turn right ");
+    motor(l_motor,m_speed);
+    motor(r_motor,m_speed);
+}
+
+int leftTurn(){
+    printf("/n turn left ");
+    motor(l_motor,-m_speed);
+    motor(r_motor,-m_speed);
+}
+
+int collectWater(){
+    while(analog(a_sensor) < 1150){
+        followLeft();
+        printf("Arm Sensor = %d\n", analog(a_sensor));
+    }
+ }
