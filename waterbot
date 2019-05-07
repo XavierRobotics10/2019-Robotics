@@ -16,7 +16,7 @@ int b_servo = 0;
 int b_sensor = 0;
 int a_sensor = 1;
 int f_sensor = 2;
-int b_line = 3600;
+int b_line = 3000;
 int close = 2700;
 int turn_pause = 3000;
 int lift_pause = 500;
@@ -24,24 +24,36 @@ int l_servo_dist = 900;
 
 int main(){
 	preFunction();
-	/*exitBox();
-    while(analog(f_sensor) < close){
-        followRight();
+	exitBox();
+	backwards();
+	msleep(1240);
+	stopMotors();
+	openArm();
+	lowerClaw();
+	driftRight();
+	msleep(2530);
+	stopMotors();
+	getOnLine();
+    while(a_sensor < 1200){
+        followLeft();
     }
-    backwards();
-    msleep(turn_pause);
-    while(analog(b_sensor) < b_line){
-   		rightTurn();
-    }
-    msleep(400);
     stopMotors();
-    straightenArm();
-    lowerClaw();
-    */
-    openArm();
-	collectWater();
-}
-
+    closeArm();
+    
+    }
+    int getOnLine(){
+    	driftLeft();
+	msleep(450);
+	driftRight();
+	msleep(700);
+    }
+    while(analoge(b_sensor)<b_line && analog(a_sensor)< 2000){
+    	driftLeft();
+	msleep(450);
+	driftRight();
+	msleep(400);
+	}
+    }
 int preFunction(){
     shut_down_in(115);
 	enable_servos(a_servo);
@@ -51,7 +63,7 @@ int preFunction(){
     enable_servos(l_servo);
     msleep(1000);
     set_servo_position(l_servo,1000);
-   	//liftClaw();
+   	liftClaw();
     msleep(500);
 }
 
@@ -81,6 +93,7 @@ int liftClaw(){
     l_servo_dist = l_servo_dist - 20;
     msleep(100);
     }
+    msleep(lift_pause);
 }
 
 int lowerClaw(){
@@ -94,22 +107,25 @@ int lowerClaw(){
 
 
 int exitBox(){
+	leftTurn();
+	msleep(1100);
 	while(analog(b_sensor) < b_line){
   		forwards(); 
 	}
     while(analog(b_sensor) > b_line){
   		forwards(); 
 	}
-    msleep(3000);
+    msleep(1000);
     while(analog(b_sensor) < b_line){
   		forwards(); 
 	}
-    msleep(500);
+    stopMotors;
 }	
 
 int forwards(){
    motor(l_motor, f_speed);
    motor(r_motor, -f_speed);
+   printf("Line sensor = %d\n", analog(b_sensor));
 }
 
 int backwards(){
